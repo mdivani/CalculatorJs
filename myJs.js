@@ -8,15 +8,15 @@ function calc() {
   var operArr = [];
   var operationString = "";
   var numIsAnswer = false;
-  
+
   // Get-Set values
-  this.getCurrent = function(){ 
+  this.getCurrent = function(){
   if(numArr[index] === undefined) {
     return 0;
-  } 
+  }
   else {
     return numArr[index];
-    }                           
+    }
   }
   this.setCurrent = function(value){
       if(numArr[index] === undefined || numIsAnswer){
@@ -27,7 +27,7 @@ function calc() {
           numArr[index] = value;
         }
         numIsAnswer = false;
-      } 
+      }
       else if(numArr[index] === "0" && value !== "."){
           numArr[index] = value;
       }
@@ -38,10 +38,10 @@ function calc() {
       }
       else {
         if(numArr[index] === "0" && value == 0){
-          
+
         }
         else {
-           numArr[index] += value;           
+           numArr[index] += value;
         }
       }
   }
@@ -52,7 +52,7 @@ function calc() {
   this.resetCurrent = function() {
     numArr[index] = "0";
   }
-  this.resetValue = function() { 
+  this.resetValue = function() {
     currentValue = 0;
     totalValue = 0;
     index = 0;
@@ -60,24 +60,25 @@ function calc() {
     operArr = [];
     operationString = "";
   }
-  
+
   //Public methods
-  this.setOperator = function(value) { 
+  this.setOperator = function(value) {
     currentValue = numArr[index];
+    if(currentValue === "-" && value === "-"){
+      return false;
+    }
     if(index === 0 && currentValue !== undefined){
       totalValue = Number(numArr[index]);
     }
-    else if(value === "-" && isPositive()){
-      console.log("value is " + value + " num is " + numArr[index] )
+    else if(value === "-" && index === 0){
       this.setCurrent(value);
-      return false;
     }
     else {
       sumTotal();
-    }  
-    if(value != "=" && numArr[index] !== undefined) {
+    }
+    if(value != "=" && currentValue !== undefined) {
        operationString += currentValue + value;
-       operArr.push(value); 
+       operArr.push(value);
        index++;
     }
     else if(numArr[index] === undefined) {
@@ -85,7 +86,7 @@ function calc() {
       operationString = operationString.replace(regex,value);
       operArr[index-1] = value;
     }
-    else {
+    else if(currentValue !== undefined){
       operArr = [];
       numArr = [];
       numArr.push(totalValue);
@@ -97,7 +98,7 @@ function calc() {
   this.getPercentage = function (){
     numArr[index] = totalValue*(Number(numArr[index])/100);
   }
-  
+
   //Private methods
   function addValue(){
     if(!isNaN(numArr[index])){
@@ -123,7 +124,7 @@ function calc() {
       totalValue = Number(totalValue.toFixed(12));
     }
   }
-    
+
   function sumTotal(){
     switch(operArr[index - 1]){
       case "+":
@@ -132,16 +133,17 @@ function calc() {
       case "-":
         subValue();
         break;
-      case "×":
+      case "Ã—":
         multiValue();
         break;
-      case "÷":
+      case "Ã·":
         divideValue();
         break;
       default:
         break;
                    }
-  } 
+  }
+  
   function isDecimal(){
    if(numArr[index].toString().indexOf(".") == -1){
      return false;
@@ -150,16 +152,11 @@ function calc() {
      return true;
     }
   }
-  function isPositive(){
-    if(Number(numArr[index]) < 0 || numArr[index] == "-") {
-      return false;
-    }
-    return true;
-  }
+
 }
 
 //Operators Array
-var operatorsArr = ["-","+","×","÷","="];
+var operatorsArr = ["-","+","Ã—","Ã·","="];
 
 //Create new Calculator object
 var calculator = new calc();
@@ -168,7 +165,7 @@ function checkOperator(value){
   var operator = operatorsArr.filter(function(op){
     return op === value;
   });
-  
+
   if(operator[0] === undefined) {
     return false;
   }
@@ -188,13 +185,13 @@ $(document).ready(function(){
     }
     else if(checkOperator(value)){
       calculator.setOperator(value);
-      
+
       if(value === "="){
         current = calculator.getTotal();
         $('.previous').children().text("");
       }
        var previous = calculator.getPervious();
-       $('.previous').children().text(previous);     
+       $('.previous').children().text(previous);
        $('.current').children().text(current);
     }
     else if(value === "AC"){
